@@ -86,15 +86,80 @@ def mutually_exclusive_method():
     st.write(f"Selected Year: {st.session_state.year_me}")
     st.write(f"Selected Season: {st.session_state.season_me}")
     st.write(f"Selected Quarter: {st.session_state.quarter_me}")
-    
+
+def improved_mutually_exclusive_method():
+    st.header("Method 3: Mutually Exclusive Filters With Clear Filters Option")
+
+    # Define options for each dropdown
+    year_options = list(range(2020, 2025))
+    season_options = ["Spring", "Summer", "Autumn", "Winter"]
+    quarter_options = ["Q1", "Q2", "Q3", "Q4"]
+
+    # Initialize session state for selected values and active filter
+    if 'active_filter' not in st.session_state:
+        st.session_state.active_filter = None
+    for filter_name in ['year', 'season', 'quarter']:
+        if f'{filter_name}_value' not in st.session_state:
+            st.session_state[f'{filter_name}_value'] = None
+
+    # Function to update selected value
+    def update_selection(filter_name):
+        st.session_state.active_filter = filter_name
+        st.session_state[f'{filter_name}_value'] = st.session_state[f'{filter_name}_select']
+
+    # Function to clear all filters
+    def clear_all_filters():
+        st.session_state.active_filter = None
+        for filter_name in ['year', 'season', 'quarter']:
+            st.session_state[f'{filter_name}_value'] = None
+            st.session_state[f'{filter_name}_select'] = None
+
+    # Create columns for dropdowns
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.subheader("Year")
+        year = st.selectbox("Select Year", year_options, key="year_select",
+                            disabled=(st.session_state.active_filter is not None and st.session_state.active_filter != 'year'),
+                            on_change=update_selection, args=('year',))
+
+    with col2:
+        st.subheader("Season")
+        season = st.selectbox("Select Season", season_options, key="season_select",
+                              disabled=(st.session_state.active_filter is not None and st.session_state.active_filter != 'season'),
+                              on_change=update_selection, args=('season',))
+
+    with col3:
+        st.subheader("Quarter")
+        quarter = st.selectbox("Select Quarter", quarter_options, key="quarter_select",
+                               disabled=(st.session_state.active_filter is not None and st.session_state.active_filter != 'quarter'),
+                               on_change=update_selection, args=('quarter',))
+
+    # Single Clear Filters button
+    st.button("Clear Filters", on_click=clear_all_filters)
+
+    # Display selected values
+    st.write(f"Selected Year: {st.session_state.year_value}")
+    st.write(f"Selected Season: {st.session_state.season_value}")
+    st.write(f"Selected Quarter: {st.session_state.quarter_value}")
+
+    # Display active filter
+    st.write(f"Active Filter: {st.session_state.active_filter}")
+
+
 def main():
     st.title("Filter Methods Comparison")
 
     radio_button_method()
     
-    st.markdown("---")  # Add a horizontal line for separation
+    st.markdown("---")  
     
     mutually_exclusive_method()
+
+    st.markdown("---")  
+
+    improved_mutually_exclusive_method()
+
 
 if __name__ == "__main__":
     main()
